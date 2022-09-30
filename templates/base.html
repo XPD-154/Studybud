@@ -1,0 +1,15 @@
+<!--set all the dependencies here in the 'base.html' and create a block for extending it to all other templates-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>start</title>
+</head>
+<body>
+    {% include 'navbar.html' %}             <!--includes a html file to any other html file-->
+   {% block content %}
+
+
+    {% endblock %}
+</body>
+</html>
