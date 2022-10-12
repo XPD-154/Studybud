@@ -1,9 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style type="text/css">
+    .room-container{
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+    }
+</style>
+<div class="room-container">
 
-<h1>Forum</h1>
-<h3>{{room.name}}</h3>
-<p>{{room.description}}</p>
+    <div>
+
+        <h1>Forum</h1>
+        <h3>{{room.name}}</h3>
+        <p>{{room.description}}</p>
+
+        <div class="comment-wrapper">
+            <h3>Coversation</h3>
+            <hr>
+            {% for comment in comments %}
+            <div>
+
+                <!--
+                <p>message id: {{comment.id}}</p>
+                <p>request user: {{request.user}}</p>
+                <p>message user: {{comment.user}}</p>
+                -->
+
+                {% if request.user == comment.user %}
+                <a href="{% url 'delete_message' comment.id %}">Delete</a>
+                {% endif %}
+
+                <small>@{{comment.user}} {{comment.created | timesince}} ago</small> <!--'timesince' converts created to a length of time-->
+                <p>{{comment.body}}</p>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if request.user.is_authenticated %}
+        <div class="comment-form">
+            <form method="POST" action=""> <!--the form will submit to the URL its currently in, no need to specify 'action'-->
+                {% csrf_token %}
+                <input type="text" name="body" placeholder="write your message here....">
+                <input type="submit" name="" value="SEND">
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <div>
+        <h3>Participants</h3>
+        <hr>
+        {% for participant in participants %}
+        <div>
+            <p>@{{participant.username}}</p>
+        </div>
+        {% endfor%}
+    </div>
+</div>
 
 {% endblock %}

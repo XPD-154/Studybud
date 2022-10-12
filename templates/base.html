@@ -1,12 +1,15 @@
 <!--set all the dependencies here in the 'base.html' and create a block for extending it to all other templates-->
+{% load static %}
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>start</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/style.css' %}">
 </head>
 <body>
     {% include 'navbar.html' %}             <!--includes a html file to any other html file-->
+
    {% block content %}
 
 

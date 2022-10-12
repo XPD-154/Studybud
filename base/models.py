@@ -10,26 +10,31 @@ class Topic(models.Model):
         return self.name
 
 class Room(models.Model):
-    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)    #refernce key in another table
+    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)    #refernce key in another table(auth_user)
     topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True)  #don't delete the reference key
     name = models.CharField(max_length=200)                                 #stands for VARCHAR
     description = models.TextField(null=True, blank=True)                   #stands for textfield
-    # participants =
+    participants = models.ManyToManyField(User, related_name='participants', blank=True) #'blank' means field can be left blank, change tag 'User' to 'participants' via related_name function
     updated = models.DateTimeField(auto_now=True)                           #DateTime field auto stamped
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-updated', '-created']                                 #order table in reverse order(-)
 
-    def __str__(self):                                                      #The __str__ function is used add a
-        return self.name                                                    #string representation of a model's object
+    def __str__(self):                                                      #The only output if its referenced
+        return self.name                                                    #anywhere without specific mention of any
+                                                                            #column
 
 class Message(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)                #delete once reference is deleted
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)                #picking the id of the 'user' creating a message. delete once reference is deleted
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)                #picking the id of the 'room' where message is created.
     body = models.TextField()
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-updated', '-created']
+
     def __str__(self):
         return self.body[0:50]
+
