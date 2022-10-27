@@ -7,3 +7,4 @@ class RoomForm(ModelForm):
     class Meta:
         model = Room           #reference the model
         fields = '__all__'     #select all the fields
+        exclude = ['host', 'participants']
