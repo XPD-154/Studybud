@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from .models import Room, Topic, Message
-from .form import RoomForm
+from .form import RoomForm, UserForm
 
 # Create your views here.
 
@@ -68,22 +68,27 @@ def user_profile(request, pk):
 #require authentication to use the method
 @login_required(login_url='/accounts/login/')
 def create_room (request):
-
+    topics = Topic.objects.all()
     form = RoomForm()
-    if request.method == 'POST':
-        form = RoomForm(request.POST)
-        if form.is_valid():
-            room = form.save(commit=False)
-            room.host = request.user
-            room.save()
-            return redirect('index')
 
-    return render(request, "base/room_form.html", {'form': form})
+    if request.method == 'POST':
+        topic_name = request.POST['topic']
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+
+        Room.objects.create(
+            host = request.user,
+            topic = topic,
+            name = request.POST['name'],
+            description = request.POST['description']
+        )
+        return redirect('index')
+
+    return render(request, "base/room_form.html", {'form': form, 'topics': topics})
 
 #require authentication to use the method
 @login_required(login_url='/accounts/login/')
 def update_room(request, pk):
-
+    topics = Topic.objects.all()
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
 
@@ -92,12 +97,15 @@ def update_room(request, pk):
         return HttpResponse('You are not allowed here')
 
     if request.method == 'POST':
-        form = RoomForm(request.POST, instance=room)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
+        topic_name = request.POST['topic']
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        room.topic = topic
+        room.name = request.POST['name']
+        room.description = request.POST['description']
+        room.save()
+        return redirect('index')
 
-    return render(request, 'base/room_form.html', {'form': form})
+    return render(request, 'base/room_form.html', {'form': form, 'topics': topics, 'room': room})
 
 #require authentication to use the method
 @login_required(login_url='/accounts/login/')
@@ -133,3 +141,16 @@ def delete_message(request, pk):
     return render(request, 'base/delete.html', {'obj': message})
 
 
+#require authentication to use the method
+@login_required(login_url='/accounts/login/')
+def update_user(request):
+    user = request.user
+    form = UserForm(instance=user)
+
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('user_profile', pk=user.id)
+
+    return render(request, 'base/update_user.html', {'form':form})
