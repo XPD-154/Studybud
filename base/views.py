@@ -22,7 +22,7 @@ def index(request):
         Q(description__icontains=q)
     )
 
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:3]
     room_count = rooms.count()
 
     comments = Message.objects.filter(Q(room__topic__name__icontains=q))
@@ -154,3 +154,29 @@ def update_user(request):
             return redirect('user_profile', pk=user.id)
 
     return render(request, 'base/update_user.html', {'form':form})
+
+def topic_page(request):
+
+    if request.GET.get('q') != None:
+        q = request.GET.get('q')
+    else:
+        q = ''
+
+    topics = Topic.objects.filter(name__icontains=q)
+
+    return render(request, 'base/topics.html', {'topics':topics})
+
+def activity_page(request):
+
+    '''
+    if request.GET.get('q') != None:
+        q = request.GET.get('q')
+    else:
+        q = ''
+
+    comments = Message.objects.filter(Q(room__topic__name__icontains=q))
+    '''
+
+    comments = Message.objects.all()
+
+    return render(request, 'base/activity.html', {'comments':comments})
