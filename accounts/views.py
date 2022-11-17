@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User, auth
+#from django.contrib.auth.models import User, auth
+from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout as django_logout
 from django.http import HttpResponse
 from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from base.models import User
 
 # Create your views here.
 
@@ -16,10 +19,10 @@ def loginpage(request):
         username = request.POST['username'].lower()
         password = request.POST['password']
 
-        user = auth.authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
 
         if user is not None:
-            auth.login(request, user)
+            login(request, user)
             messages.info(request, 'Logged in successfully!!!')
             return redirect('index')
         else:
@@ -30,7 +33,7 @@ def loginpage(request):
 
 
 def logout(request):
-    auth.logout(request)
+    django_logout(request)
     messages.info(request, 'logged out')
     return redirect('index')
 
@@ -56,11 +59,11 @@ def accounts(request):
 
             else:
 
-                user = User.objects.create_user(email=email, first_name=firstname,last_name=lastname,password=password1,username=username)
+                user = User.objects.create_user(email=email, first_name=firstname, last_name=lastname, password=password1, username=username)
                 user.save()
 
-                new_user = auth.authenticate(username=username, password=password1)
-                auth.login(request, new_user)
+                new_user = authenticate(username=email, password=password1)
+                login(request, new_user)
 
                 messages.info(request, 'user created and logged in')
                 #print('user created')

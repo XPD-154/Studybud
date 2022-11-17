@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User, auth
+#from django.contrib.auth.models import User, auth
 from django.http import HttpResponse
 from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .models import Room, Topic, Message
+from .models import Room, Topic, Message, User
 from .form import RoomForm, UserForm
 
 # Create your views here.
