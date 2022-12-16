@@ -148,7 +148,7 @@ def update_user(request):
     form = UserForm(instance=user)
 
     if request.method == 'POST':
-        form = UserForm(request.POST, instance=request.user)
+        form = UserForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('user_profile', pk=user.id)
